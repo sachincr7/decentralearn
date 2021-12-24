@@ -4,7 +4,8 @@ import BaseLayout from "@components/ui/common/layout/base";
 import { CourseCard, CourseList } from "@components/ui/course";
 import { getAllCourses } from "@content/courses/fetcher";
 import Head from "next/head";
-import Image from "next/image";
+import Link from "next/link";
+// import Image from "next/image";
 import styles from "../styles/Home.module.css";
 
 export default function Home({ courses }) {
@@ -45,9 +46,11 @@ export default function Home({ courses }) {
               </p>
             </div>
             <div className="flex items-center">
-              <Button variant="primary" className="mr-4">
-                Get Started
-              </Button>
+              <Link href="/marketplace">
+                <Button variant="primary" className="mr-4">
+                  Get Started
+                </Button>
+              </Link>
               <Button className="mr-4">Learn more</Button>
             </div>
           </div>

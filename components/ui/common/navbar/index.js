@@ -18,9 +18,11 @@ const Navbar = ({ drawerToggleClickHandler }) => {
             //   className="h-full"
             src="https://www.fivesquid.com/pics/t2/1538397410-97640-2-1.png"
           /> */}
-          <h2 className="text-2xl  tracking-tight font-extrabold text-white">
-            Decentralearn
-          </h2>
+          <Link href="/">
+            <h2 className="text-2xl cursor-pointer tracking-tight font-extrabold text-white">
+              Decentralearn
+            </h2>
+          </Link>
         </div>
         {/* <div className="ml-8"></div> */}
 
