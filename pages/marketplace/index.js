@@ -1,12 +1,20 @@
 import { useWalletInfo } from "@components/hooks/web3";
 import { useWeb3 } from "@components/providers";
+import { Button, Modal } from "@components/ui/common";
 import BaseLayout from "@components/ui/common/layout/base";
 import { CourseCard, CourseList } from "@components/ui/course";
 import { getAllCourses } from "@content/courses/fetcher";
+import { useState } from "react";
 
 export default function Marketplace({ courses }) {
-  const { hasConnectedWallet, account, network } = useWalletInfo();
+  const { hasConnectedWallet, account, network, isConnecting } =
+    useWalletInfo();
   const { requireInstall } = useWeb3();
+
+  const [selectedCourse, setSelectedCourse] = useState({
+    open: false,
+    course: null,
+  });
 
   return (
     <div className="px-4 md:max-w-7xl mx-auto xl:px-0 mt-10">
@@ -17,6 +25,7 @@ export default function Marketplace({ courses }) {
             <h2 className="subtitle mb-5 text-xl">
               I hope you are having a great day!
             </h2>
+
             <div className="md:flex justify-between items-center">
               <div className="sm:flex sm:justify-center lg:justify-start">
                 <div className="rounded-md shadow">
@@ -55,9 +64,46 @@ export default function Marketplace({ courses }) {
             disabled={!hasConnectedWallet}
             key={course.id}
             course={course}
+            Footer={() => {
+              if (requireInstall) {
+                return (
+                  <Button size="sm" variant="primary" disabled={true}>
+                    Install
+                  </Button>
+                );
+              }
+
+              if (isConnecting) {
+                return (
+                  <Button size="sm" variant="secondary" disabled={true}>
+                    Loading ...
+                  </Button>
+                );
+              }
+
+              return (
+                <Button
+                  onClick={() =>
+                    setSelectedCourse({
+                      open: true,
+                      course,
+                    })
+                  }
+                  variant="primary"
+                  size="sm"
+                  className="mt-4"
+                >
+                  Purchase
+                </Button>
+              );
+            }}
           />
         )}
       </CourseList>
+      <Modal
+        selectedCourse={selectedCourse}
+        setSelectedCourse={setSelectedCourse}
+      />
     </div>
   );
 }

@@ -4,8 +4,8 @@ const SideDrawer = ({ show }) => {
   return (
     <nav
       className={`h-full ${
-        !show && "hidden"
-      } bg-white shadow-lg transition ease-in-out delay-150 duration-300 fixed top-0 left-0 w-2/3 z-50 drawer-side`}
+        !show ? "w-0" : "w-2/3"
+      } bg-white shadow-lg transition ease-in-out delay-150 duration-300 fixed top-0 left-0  z-50 drawer-side`}
     >
       <ul className="menu text-base-content">
         <li>
