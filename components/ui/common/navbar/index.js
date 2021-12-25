@@ -70,7 +70,12 @@ const Navbar = ({ drawerToggleClickHandler }) => {
                 Install Metamask
               </button>
             ) : (
-              <Button onClick={connect} variant="primary" className="mr-4">
+              <Button
+                onClick={connect}
+                size="sm"
+                variant="primary"
+                className="mr-4"
+              >
                 Connect
               </Button>
             )}

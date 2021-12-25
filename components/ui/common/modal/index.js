@@ -1,10 +1,12 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useRef } from "react";
+import { Fragment, useRef, useState } from "react";
 import { Button } from "@components/ui/common";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon } from "@heroicons/react/outline";
 
 export default function Modal({ selectedCourse, setSelectedCourse }) {
+  const [isEthPriceEnabled, setIsEthPriceEnabled] = useState(false);
+
   const cancelButtonRef = useRef(null);
 
   return (
@@ -71,13 +73,13 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                           <label className="flex items-center mr-2">
                             <input
                               // checked={enablePrice}
-                              // onChange={({ target: { checked } }) => {
-                              //   setOrder({
-                              //     ...order,
-                              //     price: checked ? order.price : eth.perItem,
-                              //   });
-                              //   setEnablePrice(checked);
-                              // }}
+                              onChange={({ target: { checked } }) => {
+                                // setOrder({
+                                //   ...order,
+                                //   price: checked ? order.price : eth.perItem,
+                                // });
+                                setIsEthPriceEnabled(checked);
+                              }}
                               type="checkbox"
                               className="form-checkbox"
                             />
@@ -88,9 +90,10 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                         </div>
                       </div>
                       <input
+                        disabled={!isEthPriceEnabled}
                         placeholder="Enter adjusted price"
                         className="input input-bordered bg-white input-primary text-black input-sm mt-1"
-                        type="text"
+                        type="number"
                       />
                       <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-2 mt-2">
                         <p className="text-xs text-yellow-700 mt-1">
@@ -118,7 +121,7 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                         <p className="text-xs text-yellow-700 mt-1">
                           It&apos;s important to fill a correct email, otherwise
                           the order cannot be verified. We are not storing your
-                          email anywhere
+                          email anywhere.
                         </p>
                       </div>
                     </div>
@@ -150,7 +153,7 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                       <span>
                         I accept Eincode &apos;terms of service&apos; and I
                         agree that my order can be rejected in the case data
-                        provided above are not correct
+                        provided above are not correct.
                       </span>
                     </div>
                   </div>
@@ -159,6 +162,7 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <Button
                   size="md"
+                  disabled={true}
                   className="w-full md:w-1/4"
                   variant="primary"
                   // className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
