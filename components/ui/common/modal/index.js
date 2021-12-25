@@ -89,7 +89,7 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                       </div>
                       <input
                         placeholder="Enter adjusted price"
-                        className="input input-bordered bg-white input-primary text-gray-700 input-sm mt-1"
+                        className="input input-bordered bg-white input-primary text-black input-sm mt-1"
                         type="text"
                       />
                       <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-2 mt-2">
@@ -103,11 +103,13 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                     <div className="mt-2 relative rounded-md">
                       <div className="flex md:block mt-4  items-center">
                         <div className="mb-1 mr-4">
-                          <label className="mb-2 font-bold">Email</label>
+                          <label className="mb-2 font-bold text-gray-800">
+                            Email
+                          </label>
                         </div>
                         <input
                           placeholder="Enter email"
-                          className="input bg-white input-bordered text-gray-700 input-primary input-sm"
+                          className="input bg-white input-bordered text-black input-primary input-sm"
                           type="text"
                         />
                       </div>
@@ -123,11 +125,13 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                     <div className="mt-2 relative rounded-md">
                       <div className="flex md:block mt-4  items-center">
                         <div className="mb-1 mr-4">
-                          <label className="mb-2 font-bold">Repeat Email</label>
+                          <label className="mb-2 font-bold text-gray-800">
+                            Repeat Email
+                          </label>
                         </div>
                         <input
                           placeholder="Enter email"
-                          className="input bg-white input-bordered text-gray-700 input-primary input-sm"
+                          className="input bg-white input-bordered text-black input-primary input-sm"
                           type="text"
                         />
                       </div>
