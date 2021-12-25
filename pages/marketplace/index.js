@@ -65,21 +65,21 @@ export default function Marketplace({ courses }) {
             key={course.id}
             course={course}
             Footer={() => {
-              if (requireInstall) {
-                return (
-                  <Button size="sm" variant="primary" disabled={true}>
-                    Install
-                  </Button>
-                );
-              }
+              // if (requireInstall) {
+              //   return (
+              //     <Button size="sm" variant="primary" disabled={true}>
+              //       Install
+              //     </Button>
+              //   );
+              // }
 
-              if (isConnecting) {
-                return (
-                  <Button size="sm" variant="secondary" disabled={true}>
-                    Loading ...
-                  </Button>
-                );
-              }
+              // if (isConnecting) {
+              //   return (
+              //     <Button size="sm" variant="secondary" disabled={true}>
+              //       Loading ...
+              //     </Button>
+              //   );
+              // }
 
               return (
                 <Button

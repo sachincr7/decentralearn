@@ -49,7 +49,7 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
-                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <div className="hidden  mx-auto flex-shrink-0 md:flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                     <ExclamationIcon
                       className="h-6 w-6 text-red-600"
                       aria-hidden="true"
@@ -64,7 +64,9 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                     </Dialog.Title>
                     <div className="mt-4 relative rounded-md">
                       <div className="mb-1">
-                        <label className="mb-2 font-bold">Price(eth)</label>
+                        <label className=" md:block mb-2 font-bold">
+                          Price(eth)
+                        </label>
                         <div className="text-xs text-gray-700 flex">
                           <label className="flex items-center mr-2">
                             <input
@@ -87,9 +89,65 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                       </div>
                       <input
                         placeholder="Enter adjusted price"
-                        className="input input-bordered input-primary input-sm mt-2"
+                        className="input input-bordered input-primary input-sm mt-1"
                         type="text"
                       />
+                      <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-2 mt-2">
+                        <p className="text-xs text-yellow-700 mt-1">
+                          Price will be verified at the time of the order. If
+                          the price will be lower, order can be declined (+- 2%
+                          slipage is allowed)
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-2 relative rounded-md">
+                      <div className="flex md:block mt-4  items-center">
+                        <div className="mb-1 mr-4">
+                          <label className="mb-2 font-bold">Email</label>
+                        </div>
+                        <input
+                          placeholder="Enter email"
+                          className="input input-bordered input-primary input-sm"
+                          type="text"
+                        />
+                      </div>
+
+                      <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-2 mt-2">
+                        <p className="text-xs text-yellow-700 mt-1">
+                          It&apos;s important to fill a correct email, otherwise
+                          the order cannot be verified. We are not storing your
+                          email anywhere
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-2 relative rounded-md">
+                      <div className="flex md:block mt-4  items-center">
+                        <div className="mb-1 mr-4">
+                          <label className="mb-2 font-bold">Repeat Email</label>
+                        </div>
+                        <input
+                          placeholder="Enter email"
+                          className="input input-bordered input-primary input-sm"
+                          type="text"
+                        />
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-700 items-center flex mt-5">
+                      <label className="flex items-center mr-2">
+                        <input
+                          // checked={hasAgreedTOS}
+                          // onChange={({ target: { checked } }) => {
+                          //   setHasAgreedTOS(checked);
+                          // }}
+                          type="checkbox"
+                          className="form-checkbox"
+                        />
+                      </label>
+                      <span>
+                        I accept Eincode &apos;terms of service&apos; and I
+                        agree that my order can be rejected in the case data
+                        provided above are not correct
+                      </span>
                     </div>
                   </div>
                 </div>
