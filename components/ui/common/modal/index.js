@@ -58,7 +58,7 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                   <div className="mt-3  sm:mt-0 sm:ml-4 sm:text-left">
                     <Dialog.Title
                       as="h3"
-                      className="text-lg leading-6 font-medium text-gray-900"
+                      className="text-lg text-center leading-6 font-medium text-gray-900"
                     >
                       {selectedCourse?.course?.title}
                     </Dialog.Title>
