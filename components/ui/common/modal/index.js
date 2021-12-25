@@ -64,7 +64,7 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                     </Dialog.Title>
                     <div className="mt-4 relative rounded-md">
                       <div className="mb-1">
-                        <label className=" md:block mb-2 font-bold">
+                        <label className=" md:block mb-2 font-bold text-gray-800">
                           Price(eth)
                         </label>
                         <div className="text-xs text-gray-700 flex">
@@ -89,7 +89,7 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                       </div>
                       <input
                         placeholder="Enter adjusted price"
-                        className="input input-bordered input-primary input-sm mt-1"
+                        className="input input-bordered bg-white input-primary input-sm mt-1"
                         type="text"
                       />
                       <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-2 mt-2">
@@ -107,7 +107,7 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                         </div>
                         <input
                           placeholder="Enter email"
-                          className="input input-bordered input-primary input-sm"
+                          className="input bg-white input-bordered input-primary input-sm"
                           type="text"
                         />
                       </div>
@@ -127,12 +127,12 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                         </div>
                         <input
                           placeholder="Enter email"
-                          className="input input-bordered input-primary input-sm"
+                          className="input bg-white input-bordered input-primary input-sm"
                           type="text"
                         />
                       </div>
                     </div>
-                    <div className="text-xs text-gray-700 items-center flex mt-5">
+                    <div className="text-xs  items-center flex mt-5">
                       <label className="flex items-center mr-2">
                         <input
                           // checked={hasAgreedTOS}
