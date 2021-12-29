@@ -1,23 +1,85 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Button } from "@components/ui/common";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationIcon } from "@heroicons/react/outline";
+import { useEthPrice } from "@components/hooks/useEthPrice";
 
-export default function Modal({ selectedCourse, setSelectedCourse }) {
+const defaultOrder = {
+  price: "",
+  email: "",
+  confirmationEmail: "",
+};
+
+const _createFormState = (isDisabled = false, message = "") => ({
+  isDisabled,
+  message,
+});
+
+const createFormState = (
+  { price, email, confirmationEmail },
+  hasAgreedTOS,
+  isNewPurchase
+) => {
+  if (!price || Number(price) <= 0) {
+    return _createFormState(true, "Price is not valid.");
+  }
+
+  if (isNewPurchase) {
+    if (confirmationEmail.length === 0 || email.length === 0) {
+      return _createFormState(true);
+    } else if (email !== confirmationEmail) {
+      return _createFormState(true, "Email is not matching.");
+    }
+  }
+
+  if (!hasAgreedTOS) {
+    return _createFormState(
+      true,
+      "You need to agree with terms of service in order to submit the form."
+    );
+  }
+
+  return _createFormState();
+};
+
+export default function Modal({ course, onClose, onSubmit, isNewPurchase }) {
+  const [isOpen, setIsOpen] = useState(false);
   const [isEthPriceEnabled, setIsEthPriceEnabled] = useState(false);
+  const [order, setOrder] = useState(defaultOrder);
+  const [hasAgreedTOS, setHasAgreedTOS] = useState(false);
+
+  const { eth } = useEthPrice();
 
   const cancelButtonRef = useRef(null);
 
+  useEffect(() => {
+    if (!!course) {
+      setIsOpen(true);
+      setOrder({
+        ...defaultOrder,
+        price: eth.perItem,
+      });
+    }
+  }, [course]);
+
+  const closeModal = () => {
+    setIsOpen(false);
+    setOrder(defaultOrder);
+    setIsEthPriceEnabled(false);
+    setHasAgreedTOS(false);
+    onClose();
+  };
+
+  const formState = createFormState(order, hasAgreedTOS, isNewPurchase);
+
   return (
-    <Transition.Root show={selectedCourse.open || false} as={Fragment}>
+    <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
         as="div"
         className="fixed z-10 inset-0 overflow-y-auto"
         initialFocus={cancelButtonRef}
-        onClose={() => {
-          setSelectedCourse({ open: false });
-        }}
+        onClose={closeModal}
       >
         <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
           <Transition.Child
@@ -62,7 +124,7 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                       as="h3"
                       className="text-lg text-center leading-6 font-medium text-gray-900"
                     >
-                      {selectedCourse?.course?.title}
+                      {course?.title}
                     </Dialog.Title>
                     <div className="mt-4 relative rounded-md">
                       <div className="mb-1">
@@ -72,12 +134,12 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                         <div className="text-xs text-gray-700 flex">
                           <label className="flex items-center mr-2">
                             <input
-                              // checked={enablePrice}
+                              checked={isEthPriceEnabled}
                               onChange={({ target: { checked } }) => {
-                                // setOrder({
-                                //   ...order,
-                                //   price: checked ? order.price : eth.perItem,
-                                // });
+                                setOrder({
+                                  ...order,
+                                  price: checked ? order.price : eth.perItem,
+                                });
                                 setIsEthPriceEnabled(checked);
                               }}
                               type="checkbox"
@@ -91,6 +153,16 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                       </div>
                       <input
                         disabled={!isEthPriceEnabled}
+                        onChange={({ target: { value } }) => {
+                          if (isNaN(value)) {
+                            return;
+                          }
+                          setOrder({
+                            ...order,
+                            price: value,
+                          });
+                        }}
+                        value={order.price}
                         placeholder="Enter adjusted price"
                         className="input input-bordered bg-white input-primary text-black input-sm mt-1"
                         type="number"
@@ -103,49 +175,65 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                         </p>
                       </div>
                     </div>
-                    <div className="mt-2 relative rounded-md">
-                      <div className="flex md:block mt-4  items-center">
-                        <div className="mb-1 mr-4">
-                          <label className="mb-2 font-bold text-gray-800">
-                            Email
-                          </label>
-                        </div>
-                        <input
-                          placeholder="Enter email"
-                          className="input bg-white input-bordered text-black input-primary input-sm"
-                          type="text"
-                        />
-                      </div>
+                    {isNewPurchase && (
+                      <>
+                        <div className="mt-2 relative rounded-md">
+                          <div className="flex md:block mt-4  items-center">
+                            <div className="mb-1 mr-4">
+                              <label className="mb-2 font-bold text-gray-800">
+                                Email
+                              </label>
+                            </div>
+                            <input
+                              onChange={({ target: { value } }) => {
+                                setOrder({
+                                  ...order,
+                                  email: value.trim(),
+                                });
+                              }}
+                              placeholder="Enter email"
+                              className="input bg-white input-bordered text-black input-primary input-sm"
+                              type="email"
+                            />
+                          </div>
 
-                      <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-2 mt-2">
-                        <p className="text-xs text-yellow-700 mt-1">
-                          It&apos;s important to fill a correct email, otherwise
-                          the order cannot be verified. We are not storing your
-                          email anywhere.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-2 relative rounded-md">
-                      <div className="flex md:block mt-4  items-center">
-                        <div className="mb-1 mr-4">
-                          <label className="mb-2 font-bold text-gray-800">
-                            Repeat Email
-                          </label>
+                          <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-2 mt-2">
+                            <p className="text-xs text-yellow-700 mt-1">
+                              It&apos;s important to fill a correct email,
+                              otherwise the order cannot be verified. We are not
+                              storing your email anywhere.
+                            </p>
+                          </div>
                         </div>
-                        <input
-                          placeholder="Enter email"
-                          className="input bg-white input-bordered text-black input-primary input-sm"
-                          type="text"
-                        />
-                      </div>
-                    </div>
+                        <div className="mt-2 relative rounded-md">
+                          <div className="flex md:block mt-4  items-center">
+                            <div className="mb-1 mr-4">
+                              <label className="mb-2 font-bold text-gray-800">
+                                Repeat Email
+                              </label>
+                            </div>
+                            <input
+                              onChange={({ target: { value } }) => {
+                                setOrder({
+                                  ...order,
+                                  confirmationEmail: value.trim(),
+                                });
+                              }}
+                              placeholder="Enter email"
+                              className="input bg-white input-bordered text-black input-primary input-sm"
+                              type="text"
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
                     <div className="text-xs  items-center flex mt-5">
                       <label className="flex items-center mr-2">
                         <input
-                          // checked={hasAgreedTOS}
-                          // onChange={({ target: { checked } }) => {
-                          //   setHasAgreedTOS(checked);
-                          // }}
+                          checked={hasAgreedTOS}
+                          onChange={({ target: { checked } }) => {
+                            setHasAgreedTOS(checked);
+                          }}
                           type="checkbox"
                           className="form-checkbox"
                         />
@@ -156,28 +244,32 @@ export default function Modal({ selectedCourse, setSelectedCourse }) {
                         provided above are not correct.
                       </span>
                     </div>
+                    {formState.message && (
+                      <div className="p-4 my-3 text-yellow-700 bg-yellow-200 rounded-lg text-sm">
+                        {formState.message}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <Button
                   size="md"
-                  disabled={true}
+                  disabled={formState.isDisabled}
                   className="w-full md:w-1/4"
                   variant="primary"
                   // className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={() =>
-                    setSelectedCourse({ open: false, course: null })
-                  }
+                  onClick={() => {
+                    onSubmit(order, course);
+                    closeModal();
+                  }}
                 >
-                  Purchase
+                  Submit
                 </Button>
                 <button
                   type="button"
                   className="mt-3 w-full inline-flex items-center md:mr-2 justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none outline-none  focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={() =>
-                    setSelectedCourse({ open: false, course: null })
-                  }
+                  onClick={closeModal}
                   ref={cancelButtonRef}
                 >
                   Cancel

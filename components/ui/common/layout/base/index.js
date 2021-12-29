@@ -19,7 +19,7 @@ export default function BaseLayout({ children }) {
 
   return (
     <Web3Provider>
-      <div id="app" className=" bg-gray-100">
+      <div id="app" style={{ backgroundColor: "#f9fafb" }}>
         <Navbar
           drawerToggleClickHandler={drawerToggleClickHandler}
           isDrawerOpen={isDrawerOpen}

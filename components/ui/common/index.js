@@ -2,4 +2,6 @@ export { default as Navbar } from "./navbar";
 // export { default as Footer } from "./footer";
 export { default as Button } from "./Button";
 export { default as Modal } from "./modal";
-// export { default as Footer } from "./footer";
+export { default as ActiveLink } from "./link";
+export { default as Breadcrumbs } from "./breadcrumbs";
+export { default as Message } from "./message";

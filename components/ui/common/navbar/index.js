@@ -3,11 +3,11 @@ import Link from "next/link";
 import { useWeb3 } from "@components/providers";
 import { useRouter } from "next/router";
 import { Button } from "@components/ui/common";
+import { useWalletInfo } from "@components/hooks/web3";
 
 const Navbar = ({ drawerToggleClickHandler }) => {
   const { connect, isLoading, requireInstall } = useWeb3();
-  // const [menuOpen, setMenuOpen] = useState(false);
-  // const [isOpen, setIsOpen] = useState(false);
+  const { account } = useWalletInfo();
   const { pathname } = useRouter();
 
   return (
@@ -60,15 +60,18 @@ const Navbar = ({ drawerToggleClickHandler }) => {
               <button disabled={true} onClick={connect}>
                 Loading...
               </button>
+            ) : account.data ? (
+              <div className="badge badge-secondary font-bold p-3">Welcome</div>
             ) : requireInstall ? (
-              <button
-                className="btn btn-primary"
+              <Button
+                size="sm"
+                variant="warning"
                 onClick={() =>
                   window.open("https://metamask.io/download.html", "_blank")
                 }
               >
                 Install Metamask
-              </button>
+              </Button>
             ) : (
               <Button
                 onClick={connect}

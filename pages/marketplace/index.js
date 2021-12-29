@@ -1,108 +1,173 @@
-import { useWalletInfo } from "@components/hooks/web3";
+import { useOwnedCourses, useWalletInfo } from "@components/hooks/web3";
 import { useWeb3 } from "@components/providers";
 import { Button, Modal } from "@components/ui/common";
 import BaseLayout from "@components/ui/common/layout/base";
 import { CourseCard, CourseList } from "@components/ui/course";
 import { getAllCourses } from "@content/courses/fetcher";
 import { useState } from "react";
+import { MarketHeader } from "@components/ui/marketplace";
+import { useRouter } from "next/router";
 
 export default function Marketplace({ courses }) {
+  const router = useRouter();
   const { hasConnectedWallet, account, network, isConnecting } =
     useWalletInfo();
-  const { requireInstall } = useWeb3();
+  const { requireInstall, contract, web3 } = useWeb3();
 
-  const [selectedCourse, setSelectedCourse] = useState({
-    open: false,
-    course: null,
-  });
+  const [busyCourseId, setBusyCourseId] = useState(null);
+  const [isNewPurchase, setIsNewPurchase] = useState(true);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+
+  const { ownedCourses } = useOwnedCourses(courses, account.data);
+
+  const cleanUpModal = () => {
+    setSelectedCourse(null);
+    setIsNewPurchase(true);
+  };
+
+  const _purchaseCourse = async (hexCourseId, proof, value) => {
+    try {
+      const result = await contract.methods
+        .purchaseCourse(hexCourseId, proof)
+        .send({ from: account.data, value });
+      ownedCourses.mutate();
+      return result;
+    } catch (error) {
+      throw new Error(error);
+    } finally {
+      setBusyCourseId(null);
+    }
+  };
+
+  const purchaseCourse = async (order, course) => {
+    const hexCourseId = web3.utils.utf8ToHex(course.id);
+
+    const orderHash = web3.utils.soliditySha3(
+      {
+        type: "bytes16",
+        value: hexCourseId,
+      },
+      { type: "address", value: account.data }
+    );
+
+    const value = web3.utils.toWei(String(order.price));
+
+    setBusyCourseId(course.id);
+
+    if (isNewPurchase) {
+      const emailHash = web3.utils.sha3(order.email);
+      const proof = web3.utils.soliditySha3(
+        {
+          type: "bytes32",
+          value: emailHash,
+        },
+        { type: "bytes32", value: orderHash }
+      );
+
+      _purchaseCourse(hexCourseId, proof, value);
+    }
+  };
 
   return (
     <div className="px-4 md:max-w-7xl mx-auto xl:px-0 mt-10">
-      <div className="pt-4 shadow-lg">
-        <section className="text-white bg-indigo-600 rounded-lg">
-          <div className="p-8">
-            <h1 className="truncate">Hello, {account?.data}</h1>
-            <h2 className="subtitle mb-5 text-xl">
-              I hope you are having a great day!
-            </h2>
-
-            <div className="md:flex justify-between items-center">
-              <div className="sm:flex sm:justify-center lg:justify-start">
-                <div className="rounded-md shadow">
-                  <a
-                    href="#"
-                    className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-black bg-white hover:bg-gray-100 md:py-4 md:text-lg md:px-10"
-                  >
-                    Learn how to purchase
-                  </a>
-                </div>
-              </div>
-              <div className="mt-4 md:mt-0">
-                {network.hasInitialResponse && !network.isSupported && (
-                  <div className="bg-red-400 p-4 rounded-lg">
-                    <div>Connected to wrong network</div>
-                    <div>
-                      Connect to: {` `}
-                      <strong className="text-2xl">{network.target}</strong>
-                    </div>
-                  </div>
-                )}
-                {requireInstall && (
-                  <div className="bg-yellow-500 p-4 rounded-lg">
-                    Cannot connect to network. Please install Metamask.
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
+      <div className="py-4">
+        <MarketHeader />
       </div>
 
       <CourseList courses={courses}>
-        {(course) => (
-          <CourseCard
-            disabled={!hasConnectedWallet}
-            key={course.id}
-            course={course}
-            Footer={() => {
-              // if (requireInstall) {
-              //   return (
-              //     <Button size="sm" variant="primary" disabled={true}>
-              //       Install
-              //     </Button>
-              //   );
-              // }
+        {(course) => {
+          const owned = ownedCourses?.lookup[course.id];
 
-              // if (isConnecting) {
-              //   return (
-              //     <Button size="sm" variant="secondary" disabled={true}>
-              //       Loading ...
-              //     </Button>
-              //   );
-              // }
+          return (
+            <CourseCard
+              disabled={!hasConnectedWallet}
+              key={course.id}
+              course={course}
+              state={owned?.state}
+              Footer={() => {
+                if (requireInstall) {
+                  return (
+                    <Button size="sm" variant="primary" disabled={true}>
+                      Install
+                    </Button>
+                  );
+                }
 
-              return (
-                <Button
-                  onClick={() =>
-                    setSelectedCourse({
-                      open: true,
-                      course,
-                    })
-                  }
-                  variant="primary"
-                  size="sm"
-                  className="mt-4"
-                >
-                  Purchase
-                </Button>
-              );
-            }}
-          />
-        )}
+                if (isConnecting) {
+                  return (
+                    <Button size="sm" variant="secondary" disabled={true}>
+                      Loading ...
+                    </Button>
+                  );
+                }
+
+                if (!ownedCourses.hasInitialResponse) {
+                  return (
+                    <Button variant="white" disabled={true} size="sm">
+                      Loading State ...
+                    </Button>
+                  );
+                }
+
+                const isBusy = busyCourseId === course.id;
+
+                if (owned) {
+                  return (
+                    <>
+                      <div className="flex">
+                        <Button
+                          onClick={() => router.push(`/courses/${course.slug}`)}
+                          size="sm"
+                          variant="success"
+                          className="mt-4 mr-2"
+                          disabled={owned.state === "deactivated"}
+                        >
+                          View course &#10004;
+                        </Button>
+                        {owned.state === "deactivated" && (
+                          <Button
+                            onClick={() => {
+                              setIsNewPurchase(false);
+                              setSelectedCourse(course);
+                            }}
+                            size="sm"
+                            variant="error"
+                            disabled={false}
+                            className="mt-4"
+                          >
+                            Fund to activate
+                          </Button>
+                        )}
+                      </div>
+                    </>
+                  );
+                }
+
+                return (
+                  <Button
+                    onClick={() => setSelectedCourse(course)}
+                    variant="primary"
+                    size="sm"
+                    className="mt-4"
+                    disabled={!hasConnectedWallet}
+                  >
+                    Purchase
+                  </Button>
+                );
+              }}
+            />
+          );
+        }}
       </CourseList>
       <Modal
-        selectedCourse={selectedCourse}
+        onClose={cleanUpModal}
+        course={selectedCourse}
         setSelectedCourse={setSelectedCourse}
+        setIsNewPurchase={setIsNewPurchase}
+        isNewPurchase={isNewPurchase}
+        onSubmit={(formData, course) => {
+          purchaseCourse(formData, course);
+        }}
       />
     </div>
   );
